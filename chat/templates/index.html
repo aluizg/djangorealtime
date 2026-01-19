@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load bootstrap4 %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chat</title>
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Bem-vindo a minha aplicação de Chat</h1>
+        <div id="chat-window" class="border rounded p-3 mb-3">
+            Qual sala de chat você gostaria de entrar?<br/>
+            <input id="nome_sala" type="text" size="100" placeholder="Nome da sala"/><br/>
+            {% buttons %}
+                <button id="botao" type="button" class="btn btn-primary mt-2">Entrar</button>
+            {% endbuttons %}
+        </div>
+    </div>
+    <script>
+        <!--   configuracao para executar a funcao quando usuario digitar enter no campo do nome da sala     -->
+        document.querySelector('#nome_sala').focus();
+        document.querySelector('#nome_sala').onkeyup = function(e) {
+            if (e.keyCode === 13) {
+                document.querySelector('#botao').click();
+            }
+        };
+
+        document.querySelector('#botao').onclick = function(e) {
+            const salaNome = document.querySelector('#nome_sala').value;
+            if (!salaNome) {
+                alert("Por favor, insira um nome de sala válido.");
+                document.querySelector('#nome_sala').focus();
+                return;
+            }
+            window.location.pathname = '/chat/' + salaNome + '/';
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% load bootstrap4 %}
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Chat</title>
+    {% bootstrap_css %}
+</head>
+<body>
+    <div class="container">
+        <textarea id="sala" cols="100"  rows="15" readonly></textarea><br/>
+        <input id="mensagem" type="text" size="100" placeholder="Digite sua mensagem aqui"/><br/>
+        {% buttons %}
+            <button id="botao" type="button" class="btn btn-primary mt-2">Enviar</button>
+        {% endbuttons %}
+    </div>
+{% bootstrap_javascript jquery='full' %}
+<script>
+    var salaNome = {{ nome_sala_json }};
+    var chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + salaNome + '/'
+    );
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        var mensagem = data['mensagem'];
+        document.querySelector('#sala').value += (mensagem + '\n');
+    };
+    chatSocket.onclose = function(e) {
+        console.error('Chat encerrado');
+        console.log(e);
+    };
+    document.querySelector('#mensagem').focus();
+    document.querySelector('#mensagem').onkeyup = function(e) {
+        console.log("Tecla pressionada");
+        if (e.keyCode === 13) {
+            document.querySelector('#botao').click();
+        }
+    };
+    document.querySelector('#botao').onclick = function(e) {
+        console.log("Enviando mensagem");
+        var mensagemInputDom = document.querySelector('#mensagem');
+        var mensagem = mensagemInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': mensagem
+        }));
+        mensagemInputDom.value = '';
+    };
+</script>
+</body>
+</html>
